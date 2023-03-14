@@ -1,0 +1,65 @@
+{#<!DOCTYPE html>#}
+{#<html>#}
+{#<head>#}
+{#	<title>SRP Registration</title>#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"#}
+{#      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">#}
+{#</head>#}
+{#<body>#}
+{#	<h1>SRP Registration</h1>#}
+{#	<form action="/register" method="POST">#}
+{#		<label for="username">Username:</label>#}
+{#		<input type="text" name="username" id="username"><br><br>#}
+{#		<label for="password">Password:</label>#}
+{#		<input type="password" name="password" id="password"><br><br>#}
+{#		<input type="submit" value="Register">#}
+{#	</form>#}
+{#</body>#}
+{#</html>#}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- NOTE this script is at https://github.com/simbo1905/thinbus-srp-npm/blob/master/browser.js -->
+        <script src="{{ url_for('static', filename='browser.js') }}"></script>
+    </head>
+    <body>
+        <h1>Thinbus Secure Remote Password Register Demo</h1>
+        <form action="/register" method="post">
+            username <input type="text" name="username" id="username"></input><br/>
+            password <input type="password" name="verifier" id="verifier"></input><br/>
+            <input type="hidden" name="salt" id="salt"></input>
+            <input type="hidden" name="verifier" id="verifier"></input>
+            <button type="button" onclick="createVerifier(this.parentElement)">Register</button>
+        </form>
+<script>
+// RFC 5054 2048bit constants
+var rfc5054 = {
+    N_base10: "21766174458617435773191008891802753781907668374255538511144643224689886235383840957210909013086056401571399717235807266581649606472148410291413364152197364477180887395655483738115072677402235101762521901569820740293149529620419333266262073471054548368736039519702486226506248861060256971802984953561121442680157668000761429988222457090413873973970171927093992114751765168063614761119615476233422096442783117971236371647333871414335895773474667308967050807005509320424799678417036867928316761272274230314067548291133582479583061439577559347101961771406173684378522703483495337037655006751328447510550299250924469288819",
+    g_base10: "2",
+    k_base16: "4cba3fb2923e01fb263ddbbb185a01c131c638f2561942e437727e02ca3c266d"
+}
+function createVerifier(form) {
+    var password = document.getElementById('verifier').value;
+
+    var username = document.getElementById('username').value;
+    // here we are using a module generated using "browserify --standalone thinbus" that adds the exported thinbus
+    // client session factor function onto the window object
+    var SRP6JavascriptClientSessionSHA256 = window.thinbus(rfc5054.N_base10, rfc5054.g_base10, rfc5054.k_base16);
+
+    var srpClient = new SRP6JavascriptClientSessionSHA256();
+
+    var salt = srpClient.generateRandomSalt();
+
+    var verifier = srpClient.generateVerifier(salt, username, password);
+
+    document.getElementById('verifier').value = verifier;
+
+    document.getElementById('salt').value = salt;
+
+    form.submit();
+}
+</script>
+    </body>
+</html>

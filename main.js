@@ -1,0 +1,1 @@
+window.thinbus = require('thinbus-srp');

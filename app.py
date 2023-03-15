@@ -27,6 +27,11 @@ def get_user(username):
     return salt, verifier
 
 
+def convert_to_bytes(string):
+    string = bytes([int(string[i:i + 2], 16) for i in range(0, len(string), 2)])
+    return string
+
+
 @app.route('/')
 def hello_world():  # put application's code here
     return render_template('index.html')
@@ -113,10 +118,10 @@ def authenticate():
         salt, verifier = user_info
         salt = bytes.fromhex(salt)
         verifier = bytes.fromhex(verifier)
-        A = bytes.fromhex(A)
+        A = convert_to_bytes(A)
+        M1 = convert_to_bytes(M1)
         b = cache[0]
         svr = srp.Verifier(username, salt, verifier, A, hash_alg=srp.SHA256, bytes_b=b)
-        print(svr)
         HAMK = svr.verify_session(M1, A)
         print("HAMK: ", HAMK)
         return render_template('welcome.html')

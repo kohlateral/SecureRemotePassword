@@ -55,11 +55,8 @@ function autenticate(form) {
             document.getElementById('credentials').value = JSON.stringify(credentials);
 
             console.log("shared key: "+srpClient.getSessionKey());
-            const sleep = ms => new Promise(r => setTimeout(r, ms));
-            sleep(5000).then(() => {
-                form.submit();
-            });
-            {#form.submit();#}
+            
+            form.submit();
         }
     };
     xhttp.open("POST", "/challenge", true);

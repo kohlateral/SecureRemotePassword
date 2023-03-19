@@ -149,7 +149,7 @@ function SRP6JavascriptClientSession() {
 			throw new Error(name+" must not be null, empty or zero");
 		}
 	};
-	
+
 	/** private<p>
 	 * 
 	 * Computes x = H(s | H(I | ":" | P))
@@ -169,29 +169,12 @@ function SRP6JavascriptClientSession() {
 		//console.log("js i:"+identity);
 		//console.log("js p:"+password);
 		this.salt = salt;
-		var hash1 = this.H(identity+':'+password);
-		
-		// server BigInteger math will trim leading zeros so we must do likewise to get a match
-		while (hash1.substring(0, 1) === '0') { 
-			//console.log("stripping leading zero from M1");
-			hash1 = hash1.substring(1);
-		}
-		
-		//console.log("js hash1:"+hash1);
-		//console.log("js salt:"+salt);
-		var concat = (salt+hash1).toUpperCase();
-		//console.log("js concat:"+concat);
-		var hash = this.H(concat);
-		
-		// Java BigInteger math will trim leading zeros so we do likewise
-		while (hash.substring(0, 1) === '0') { 
-			//console.log("stripping leading zero from M1");
-			hash = hash.substring(1);
-		}		
-		
-		//console.log("js hash:"+hash)
-		//console.log("js x before modN "+this.fromHex(hash));
-		this.x = this.fromHex(hash).mod(this.N());
+		const hash1 = this.H(identity + ':' + password);
+		const concat = (salt+hash1);
+		const byteArray = CryptoJS.enc.Hex.parse(concat);
+		const hash = this.H(byteArray);
+		const hashHex = hash.toString();
+		this.x = this.fromHex(hashHex);
 		return this.x;
 	};
 
@@ -270,7 +253,10 @@ SRP6JavascriptClientSession.prototype.getSessionKey = function(hash) {
 		return this.SS;
 	} else {
 		if( this.K === null ) {
-			this.K = this.H(this.SS);
+			const key = CryptoJS.enc.Hex.parse(this.SS);
+			this.K = this.H(key);
+			console.log("K:"+this.K);
+			// this.K = this.H(this.SS);
 		}
 		return this.K;
 	}
@@ -372,10 +358,14 @@ SRP6JavascriptClientSession.prototype.computeU = function(Astr, Bstr) {
 	this.check(Astr, "Astr");
 	this.check(Bstr, "Bstr");
 	/* jshint ignore:start */
-	var output = this.H(Astr+Bstr);
-	//console.log("js raw u:"+output);
+	const concat = (Astr+Bstr);
+	const byteArray = CryptoJS.enc.Hex.parse(concat);
+	const output = this.H(byteArray);
+
+	// var output = this.H(Astr+Bstr);
+	// console.log("js raw u:"+output);
 	var u = new BigInteger(""+output,16);
-	//console.log("js u:"+this.toHex(u));
+	console.log("js u:"+this.toHex(u));
 	if( BigInteger.ZERO.equals(u) ) {
 	   throw new Error("SRP6Exception bad shared public value 'u' as u==0");
 	}
@@ -514,7 +504,7 @@ SRP6JavascriptClientSession.prototype.step2 = function(s, BB) {
 
 	this.a = this.randomA(this.N);
 
-    //console.log("a:" + this.toHex(this.a));
+    // console.log("a:" + this.toHex(this.a));
 
 	this.A = this.g().modPow(this.a, this.N());
 	//console.log("A:" + this.toHex(this.A));
@@ -529,13 +519,68 @@ SRP6JavascriptClientSession.prototype.step2 = function(s, BB) {
 	//console.log("jsU:" + this.toHex(this.u));
 	//console.log("jsS:" + this.toHex(this.S));
 	
-	var AA = this.toHex(this.A);
+	// var AA = this.toHex(this.A);
 
 //	console.log("cAA:"+AA);
 //	console.log("cBB:"+BB);
 //	console.log("cSS:"+this.toHex(this.S));
 
-	this.M1str = this.H(AA+BB+this.toHex(this.S));
+	function toHexString(byteArray) {
+		return Array.from(byteArray, function(byte) {
+			return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+		}).join('')
+	}
+
+	// hash N
+	let N_num = BigInt(this.N());
+	const hex_N = N_num.toString(16);
+	console.log("N:"+N_num);
+	console.log("N hex:"+hex_N);
+	const NbyteArray = CryptoJS.enc.Hex.parse(hex_N);
+	console.log("N bytes:"+NbyteArray);
+	const NHash = this.H(NbyteArray);
+	console.log("Nhash:"+NHash);
+
+	// hash g
+	let g_num = this.g();
+	const hex_g = g_num.toString(16).padStart(2, '0');
+	console.log("g:"+g_num);
+	console.log("g hex:"+hex_g);
+	const gbyteArray = CryptoJS.enc.Hex.parse(hex_g);
+	console.log("g bytes:"+gbyteArray);
+	const gHash = CryptoJS.SHA256(gbyteArray).toString();
+	console.log("ghash:"+gHash);
+
+
+	// xor N and g
+	let result = new Uint8Array(NHash.length);
+	for (let i = 0; i < NHash.length; i++) {
+    	result[i] = NHash[i] ^ gHash[i];
+	}
+	const hexString = toHexString(result);
+	console.log("xor:"+result);
+	console.log("xor hex:"+hexString);
+
+
+	const II = this.toHex(this.I);
+	const IbyteArray = CryptoJS.enc.Hex.parse(II);
+	this.I = this.H(IbyteArray);
+	console.log("I after hash:"+this.I);
+
+	var SS = this.toHex(this.S);
+
+	var AA = this.toHex(this.A);
+
+	const concat = II+s+AA+BB+SS;
+	console.log("concat:"+concat);
+	const byteArray = CryptoJS.enc.Hex.parse(concat);
+	this.M1str = this.H(byteArray);
+	// this.M1str = this.H(AA+BB+this.toHex(this.S));
+	//  M = H(H(N) xor H(g), H(I), s, A, B, K)
+	// H(H(N) ^ H(g), H(I), s, A, B, K)
+
+
+
 	this.check(this.M1str, "M1str");
 	
 	// server BigInteger math will trim leading zeros so we must do likewise to get a match

@@ -11,7 +11,7 @@ c = conn.cursor()
 
 # Create users table if it doesn't exist
 c.execute('''CREATE TABLE IF NOT EXISTS users
-             (username TEXT PRIMARY KEY, verifier TEXT, salt TEXT)''')
+             (username TEXT PRIMARY KEY, verifier TEXT, salt TEXT UNIQUE NOT NULL)''')
 
 cache = []
 
@@ -61,8 +61,8 @@ def challenge():
 
     # Retrieve the user's salt and verifier from the database
     salt, verifier = user_info
-    salt = bytes.fromhex(salt)
-    verifier = bytes.fromhex(verifier)
+    salt = convert_to_bytes(salt)
+    verifier = convert_to_bytes(verifier)
 
     # server computes public ephemeral value B as a challenge value
     svr = srp.Verifier(username, salt, verifier, hash_alg=srp.SHA256)
@@ -116,8 +116,8 @@ def authenticate():
 
         user_info = get_user(username)
         salt, verifier = user_info
-        salt = bytes.fromhex(salt)
-        verifier = bytes.fromhex(verifier)
+        salt = convert_to_bytes(salt)
+        verifier = convert_to_bytes(verifier)
         A = convert_to_bytes(A)
         M1 = convert_to_bytes(M1)
         b = cache[0]

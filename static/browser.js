@@ -533,7 +533,7 @@ SRP6JavascriptClientSession.prototype.step2 = function(s, BB) {
 
 	// hash N
 	let N_num = BigInt(this.N());
-	const hex_N = N_num.toString(16);
+	let hex_N = N_num.toString(16);
 	console.log("N:"+N_num);
 	console.log("N hex:"+hex_N);
 	const NbyteArray = CryptoJS.enc.Hex.parse(hex_N);
@@ -543,7 +543,7 @@ SRP6JavascriptClientSession.prototype.step2 = function(s, BB) {
 
 	// hash g
 	let g_num = this.g();
-	const hex_g = g_num.toString(16).padStart(2, '0');
+	let hex_g = g_num.toString(16).padStart(2, '0');
 	console.log("g:"+g_num);
 	console.log("g hex:"+hex_g);
 	const gbyteArray = CryptoJS.enc.Hex.parse(hex_g);
@@ -553,31 +553,91 @@ SRP6JavascriptClientSession.prototype.step2 = function(s, BB) {
 
 
 	// xor N and g
-	let result = new Uint8Array(NHash.length);
-	for (let i = 0; i < NHash.length; i++) {
-    	result[i] = NHash[i] ^ gHash[i];
-	}
-	const hexString = toHexString(result);
-	console.log("xor:"+result);
-	console.log("xor hex:"+hexString);
+	// const NHashArray = CryptoJS.enc.Hex.parse(NHash);
+	// console.log("N hash bytes:"+NHashArray);
+	// const gHashArray = CryptoJS.enc.Hex.parse(gHash);
+	// console.log("g hash bytes:"+gHashArray);
+	let HNxorg = '';
+	let NHashArray = new Uint8Array(NHash.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+	let gHashArray = new Uint8Array(gHash.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+	console.log("NHashArray:"+NHashArray);
+	// let NHashArrayString = bytesToHex(NHashArray);
+	// console.log("NHashArrayString:"+NHashArrayString);
+	console.log("NHashArray length:"+NHashArray.length);
+	for (let i = 0; i < NHashArray.length; i++) {
+		// HNxorg += String.fromCharCode(NHashArray[i] ^ gHashArray[i]);
+		const charCode =  String.fromCharCode(NHashArray[i] ^ gHashArray[i]);
+  		const hex = ("0" + (charCode.charCodeAt(0) & 0xFF).toString(16)).slice(-2);
+	  	HNxorg += hex;
+		// result += (NHashArray[i] ^ gHashArray[i]);
+  	}
+	// const hexString = toHexString(result);
+	console.log("xor:"+HNxorg);
+	// let hexString = bytesToHex(result);
+	// console.log("xor hex:"+hexString);
 
 
-	const II = this.toHex(this.I);
-	const IbyteArray = CryptoJS.enc.Hex.parse(II);
-	this.I = this.H(IbyteArray);
+	let II = this.toHex(this.I);
+	// const IbyteArray = CryptoJS.enc.Hex.parse(II);
+	II = this.H(II);
 	console.log("I after hash:"+this.I);
 
-	var SS = this.toHex(this.S);
 
 	var AA = this.toHex(this.A);
 
-	const concat = II+s+AA+BB+SS;
-	console.log("concat:"+concat);
-	const byteArray = CryptoJS.enc.Hex.parse(concat);
-	this.M1str = this.H(byteArray);
+	// const concat = HNxorg+II+s+AA+BB+SS;
+	// console.log("concat:"+concat);
+	// const byteArray = CryptoJS.enc.Hex.parse(concat);
+	// this.M1str = this.H(byteArray);
 	// this.M1str = this.H(AA+BB+this.toHex(this.S));
 	//  M = H(H(N) xor H(g), H(I), s, A, B, K)
 	// H(H(N) ^ H(g), H(I), s, A, B, K)
+
+	const M1hash = CryptoJS.algo.SHA256.create();
+	let clonedHash = M1hash.clone();
+
+	M1hash.update(CryptoJS.enc.Hex.parse(HNxorg));
+	clonedHash.update(CryptoJS.enc.Hex.parse(HNxorg));
+	let hashHex = clonedHash.finalize().toString(CryptoJS.enc.Hex);
+	console.log("M1hash xor:"+hashHex);
+
+
+	clonedHash = M1hash.clone();
+	M1hash.update(CryptoJS.enc.Hex.parse(II));
+	clonedHash.update(CryptoJS.enc.Hex.parse(II));
+	hashHex = clonedHash.finalize().toString(CryptoJS.enc.Hex);
+	console.log("M1hash I:"+hashHex);
+
+	clonedHash = M1hash.clone();
+	M1hash.update(CryptoJS.enc.Hex.parse(s));
+	clonedHash.update(CryptoJS.enc.Hex.parse(s));
+	hashHex = clonedHash.finalize().toString(CryptoJS.enc.Hex);
+	console.log("M1hash s:"+hashHex);
+
+	clonedHash = M1hash.clone();
+	M1hash.update(CryptoJS.enc.Hex.parse(AA));
+	clonedHash.update(CryptoJS.enc.Hex.parse(AA));
+	hashHex = clonedHash.finalize().toString(CryptoJS.enc.Hex);
+	console.log("M1hash AA:"+hashHex);
+
+	clonedHash = M1hash.clone();
+	M1hash.update(CryptoJS.enc.Hex.parse(BB));
+	clonedHash.update(CryptoJS.enc.Hex.parse(BB));
+	hashHex = clonedHash.finalize().toString(CryptoJS.enc.Hex);
+	console.log("M1hash BB:"+hashHex);
+
+	clonedHash = M1hash.clone();
+	let SS = this.toHex(this.S);
+	const key = CryptoJS.enc.Hex.parse(SS);
+	this.K = this.H(key);
+	console.log("K:"+this.K);
+	M1hash.update(CryptoJS.enc.Hex.parse(this.K));
+	clonedHash.update(CryptoJS.enc.Hex.parse(this.K));
+	hashHex = clonedHash.finalize().toString(CryptoJS.enc.Hex);
+	console.log("M1hash final:"+hashHex);
+
+	this.M1str = M1hash.finalize().toString(CryptoJS.enc.Hex);
+
 
 
 

@@ -2,7 +2,6 @@ import hashlib
 
 from Crypto.Util.Padding import pad
 from flask import Flask, render_template, redirect, url_for, request, session, make_response
-from flask_login import LoginManager
 import srp
 import sqlite3
 import json
@@ -20,7 +19,7 @@ c = conn.cursor()
 
 # Create users table if it doesn't exist
 c.execute('''CREATE TABLE IF NOT EXISTS users
-             (username TEXT PRIMARY KEY, verifier TEXT, salt TEXT)''')
+             (username TEXT PRIMARY KEY, verifier TEXT, salt TEXT UNIQUE NOT NULL)''')
 
 cache = []
 
@@ -64,7 +63,7 @@ def hello_world():  # put application's code here
 def welcome():
 
     if 'ID' in session:
-        sensitive = "<h1>Big Secret</h1>".encode()
+        sensitive = "<h1>Big Secret that only you can see</h1>".encode()
         key = session['sharedKey']
         sensitive, iv = encrypt_AES_CBC(key, sensitive)
         print(sensitive)
@@ -159,7 +158,8 @@ def authenticate():
         HAMK = svr.verify_session(M1, A)
         print("HAMK: ", HAMK)
         if HAMK is None:
-            return render_template('login.html', error='Invalid username or password')
+            return redirect(url_for('login'))
+        print("HAMK: ", HAMK)
         session['ID'] = hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest()
         session['sharedKey'] = svr.get_session_key()
         return redirect(url_for('welcome'))

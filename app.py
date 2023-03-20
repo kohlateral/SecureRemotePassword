@@ -158,6 +158,8 @@ def authenticate():
         svr = srp.Verifier(username, salt, verifier, A, hash_alg=srp.SHA256, bytes_b=b)
         HAMK = svr.verify_session(M1, A)
         print("HAMK: ", HAMK)
+        if HAMK is None:
+            return render_template('login.html', error='Invalid username or password')
         session['ID'] = hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest()
         session['sharedKey'] = svr.get_session_key()
         return redirect(url_for('welcome'))

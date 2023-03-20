@@ -123,8 +123,11 @@ def authenticate():
         b = cache[0]
         svr = srp.Verifier(username, salt, verifier, A, hash_alg=srp.SHA256, bytes_b=b)
         HAMK = svr.verify_session(M1, A)
-        print("HAMK: ", HAMK)
-        return render_template('welcome.html')
+        if HAMK is None:
+            return redirect(url_for('login'))
+        else:
+            print("HAMK: ", HAMK)
+            return redirect(url_for('welcome'))
 
 
 @app.route('/logout')

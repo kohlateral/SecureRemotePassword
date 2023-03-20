@@ -515,7 +515,7 @@ SRP6JavascriptClientSession.prototype.step2 = function(s, BB) {
 	
 	this.S = this.computeSessionKey(this.k, x, this.u, this.a, this.B);
 	this.check(this.S, "S");
-	
+
 	//console.log("jsU:" + this.toHex(this.u));
 	//console.log("jsS:" + this.toHex(this.S));
 	

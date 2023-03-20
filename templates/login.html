@@ -56,6 +56,7 @@ function autenticate(form) {
 
             console.log("shared key: "+srpClient.getSessionKey());
 
+            sessionStorage.setItem('sharedKey', srpClient.getSessionKey());
             form.submit();
         }
     };

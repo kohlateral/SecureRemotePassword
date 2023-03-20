@@ -14,7 +14,7 @@
         </p>
         <form action="/register" method="post">
             username <input type="text" name="username" id="username"></input><br/>
-            password <input type="password" name="verifier" id="verifier"></input><br/>
+            password <input type="password" name="password" id="password"></input><br/>
             <input type="hidden" name="salt" id="salt"></input>
             <input type="hidden" name="verifier" id="verifier"></input>
             <button type="button" onclick="createVerifier(this.parentElement)">Register</button>
@@ -27,7 +27,7 @@ var rfc5054 = {
     k_base16: "4cba3fb2923e01fb263ddbbb185a01c131c638f2561942e437727e02ca3c266d"
 }
 function createVerifier(form) {
-    var password = document.getElementById('verifier').value;
+    var password = document.getElementById('password').value;
 
     var username = document.getElementById('username').value;
     // here we are using a module generated using "browserify --standalone thinbus" that adds the exported thinbus

@@ -54,8 +54,8 @@ def set_idle_timeout():
     session.modified = True
 
 @app.route('/')
-def hello_world():  # put application's code here
-    return render_template('index.html')
+def hello_world():# put application's code hereS
+        return render_template('index.html')
 
 
 # Route for handling the landing page logic
@@ -165,11 +165,11 @@ def authenticate():
         return redirect(url_for('welcome'))
 
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET'])
 def logout():
     session.pop('ID', None)
     return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 5000, ssl_context='adhoc')
+    app.run('0.0.0.0', 5000)

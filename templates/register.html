@@ -29,6 +29,8 @@ var rfc5054 = {
 function createVerifier(form) {
     var password = document.getElementById('password').value;
 
+    document.getElementById('password').remove();
+
     var username = document.getElementById('username').value;
     // here we are using a module generated using "browserify --standalone thinbus" that adds the exported thinbus
     // client session factor function onto the window object

@@ -1,5 +1,4 @@
 import hashlib
-
 from Crypto.Util.Padding import pad
 from flask import Flask, render_template, redirect, url_for, request, session, make_response
 import srp
@@ -63,7 +62,7 @@ def hello_world():# put application's code hereS
 def welcome():
 
     if 'ID' in session:
-        sensitive = "<h1>Big Secret that only you can see</h1>".encode()
+        sensitive = "<p>4147 4682 6601 9830</p>".encode()
         key = session['sharedKey']
         sensitive, iv = encrypt_AES_CBC(key, sensitive)
         print(sensitive)

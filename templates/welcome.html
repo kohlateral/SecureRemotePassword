@@ -1,24 +1,68 @@
 <!DOCTYPE html>
 <html>
-  <head>
 
+<head>
+  <title>Flask Intro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/welcomeCSS.css">
+</head>
 
-      <title>Flask Intro</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  </head>
-  <body>
-    <div class="container">
-      <h2>Welcome to Flask!</h2>
-      <br>
-        <p>Click <a href="/">here</a> to go home. And <a href="/logout">here</a> to logout</p>
-        <h2> Sensitive data </h2>
-        <p id="encrypted">{{ encrypted_data }}</p>
-        <p id="iv">{{ iv }}</p>
+<body>
+  <div class="navbar">
+    <img src="/static/images/logo.png" class="logo">
+    <ul>
+        <li><a href="/">Log Out</a></li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="card">
+      <div class="card_inner">
+        <div class="front">
+          <img src="/static/images/map.png" class="map_img">
+          <div class="row">
+            <img src="/static/images/chip.png" width="60px">
+            <img src="/static/images/visa.png" width="80px">
+          </div>
+          <div class="row card_num">
+            <p id="encrypted">{{ encrypted_data }}</p>
+            <p id="iv">{{ iv }}</p>
+          </div>
+          <div class="row card_info">
+            <p>CARD HOLDER</p>
+            <p>VALID TILL</p>
+          </div>
+          <div class="row name">
+            <p>USER</p>
+            <p>01/28</p>
+          </div>
+        </div>
+        <div class="back">
+          <img src="/static/images/map.png" class="map_img">
+          <div class="bar"></div>
+            <div class="row card_cvv">
+              <div>
+                <img src="/static/images/pattern.png">
+              </div>
+              <p>123</p>
+            </div>
+            <div class="row card_text">
+              <p>This is a virtual card design</p>
+            </div>
+            <div class="row signature">
+              <p>CUSTOMER SIGNATURE</p>
+              <img src="/static/images/visa.png" width="80px">
+            </div>
+        </div>
+      </div>
     </div>
-  </body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/aes.min.js" integrity="sha512-4b1zfeOuJCy8B/suCMGNcEkMcQkQ+/jQ6HlJIaYVGvg2ZydPvdp7GY0CuRVbNpSxNVFqwTAmls2ftKSkDI9vtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="{{ url_for('static', filename='crypto.js')  }}"></script>
+  </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
+  integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/aes.min.js"
+  integrity="sha512-4b1zfeOuJCy8B/suCMGNcEkMcQkQ+/jQ6HlJIaYVGvg2ZydPvdp7GY0CuRVbNpSxNVFqwTAmls2ftKSkDI9vtA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ url_for('static', filename='crypto.js')  }}"></script>
+
 </html>

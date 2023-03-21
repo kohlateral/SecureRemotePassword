@@ -1,24 +1,42 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Register</title>
         <!-- NOTE this script is at https://github.com/kohlateral/SecureRemotePassword/blob/main/static/browser.js -->
         <script src="{{ url_for('static', filename='browser.js') }}"></script>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     </head>
     <body>
-        <h1>Thinbus Secure Remote Password Register Demo</h1>
-        <p>
-        If you already have an account,  <a href="login">login</a> here.
-        </p>
-        <form action="/register" method="post">
-            username <input type="text" name="username" id="username"></input><br/>
-            password <input type="password" name="password" id="password"></input><br/>
-            <input type="hidden" name="salt" id="salt"></input>
-            <input type="hidden" name="verifier" id="verifier"></input>
-            <button type="button" onclick="createVerifier(this.parentElement)">Register</button>
-        </form>
+        <section class="container forms">
+            <div class="form login">
+                <div class="form-content">
+                    <img src="{{url_for('static', filename='images/bear_traveller.png')}}" class="logo">
+                    <header>Signup</header>
+                    <form action="/register" method="post">
+                        <div class="field input-field">
+                            <input type="text" placeholder="Username"name=" username" id="username" class="input">
+                        </div>
+
+                        <div class="field input-field">
+                            <input type="password" placeholder="Password" name="verifier" id="verifier" class="password">
+                        </div>
+                        <input type="hidden" name="salt" id="salt"></input>
+                        <input type="hidden" name="verifier" id="verifier"></input>
+                        <div class="field button-field">
+                            <button type="button" onclick="createVerifier(this.parentElement.parentElement)">Register</button>
+                        </div>
+                    </form>
+
+                    <div class="form-link">
+                        <span>Already have an account? <a href="login" class="link login-link">Login</a></span>
+                    </div>
+                </div>
+            </div>
+        </section>
 <script>
 // RFC 5054 2048bit constants
 var rfc5054 = {

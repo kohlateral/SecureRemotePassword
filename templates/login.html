@@ -1,21 +1,38 @@
 <html>
     <head>
+        <title>Login</title>
         <script src="{{ url_for('static', filename='browser.js') }}"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css"href="/static/css/style.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     </head>
     <body>
-        <h1>Thinbus Secure Remote Password Authentication Demo</h1>
-        <p>
-        You need to <a href="register">register using SRP</a> to be able to login.
-        </p>
-        <form action="/authenticate" method="post" onsubmit="return false">
-            username <input type="text" name="username" id="username"></input><br/>
-            password <input type="password" id="do_no_post"></input><br/>
-            <input type="hidden" name="credentials" id="credentials"></input>
-            <button type="button" onclick="autenticate(this.parentElement)">Login</button>
-        </form>
+        <section class="container forms">
+            <div class="form login">
+                <div class="form-content">
+                    <img src="{{url_for('static', filename='images/bear_traveller.png')}}" class="logo">
+                    <header>Login</header>
+                    <form action="/authenticate" method="post" onsubmit="return false">
+                        <div class="field input-field">
+                            <input type="username" placeholder="Username" id="username" class="input">
+                        </div>
+
+                        <div class="field input-field">
+                            <input type="password" placeholder="Password" id="do_no_post" class="password">
+                        </div>
+                        <input type="hidden" name="credentials" id="credentials"></input>
+                        <div class="field button-field">
+                            <button type="button" onclick="autenticate(this.parentElement.parentElement)">Login</button>
+                        </div>
+                    </form>
+
+                    <div class="form-link">
+                        <span>Don't have an account? <a href="register" class="link signup-link">Signup</a></span>
+                    </div>
+                </div>
+            </div>
+        </section>
 <script>
 // RFC 5054 2048bit constants
 var rfc5054 = {

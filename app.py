@@ -38,13 +38,16 @@ def convert_to_bytes(string):
     string = bytes([int(string[i:i + 2], 16) for i in range(0, len(string), 2)])
     return string
 
+
 def decrypt_verifier(verifier):
     cipher = AES.new(app.secret, AES.MODE_ECB)
     return cipher.decrypt(b64decode(verifier))
 
+
 def encrypt_AES_CBC(key, data):
     cipher = AES.new(key, AES.MODE_CBC)
     return b64encode(cipher.encrypt(pad(data, AES.block_size))).decode('utf-8'), b64encode(cipher.iv).decode('utf-8')
+
 
 @app.before_request
 def set_idle_timeout():
@@ -52,8 +55,9 @@ def set_idle_timeout():
     app.permanent_session_lifetime = timedelta(minutes=10)
     session.modified = True
 
+
 @app.route('/')
-def hello_world():# put application's code hereS
+def landing_page():
         return render_template('index.html')
 
 
@@ -66,7 +70,7 @@ def welcome():
         key = session['sharedKey']
         sensitive, iv = encrypt_AES_CBC(key, sensitive)
         print(sensitive)
-        return render_template('welcome.html',encrypted_data=sensitive, iv=iv)
+        return render_template('welcome.html', encrypted_data=sensitive, iv=iv)
     else:
         return redirect(url_for('login'))
 
@@ -155,9 +159,10 @@ def authenticate():
         b = cache[0]
         svr = srp.Verifier(username, salt, verifier, A, hash_alg=srp.SHA256, bytes_b=b)
         HAMK = svr.verify_session(M1, A)
-        print("HAMK: ", HAMK)
         if HAMK is None:
+            cache.pop()
             return redirect(url_for('login'))
+        cache.pop()
         print("HAMK: ", HAMK)
         session['ID'] = hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest()
         session['sharedKey'] = svr.get_session_key()

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Register</title>
         <!-- NOTE this script is at https://github.com/kohlateral/SecureRemotePassword/blob/main/static/browser.js -->
+        <title>Register</title>
         <script src="{{ url_for('static', filename='browser.js') }}"></script>
         <link rel="stylesheet" href="/static/css/style.css">
         <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
@@ -18,19 +18,20 @@
                     <header>Signup</header>
                     <form action="/register" method="post">
                         <div class="field input-field">
-                            <input type="text" placeholder="Username"name=" username" id="username" class="input">
+                            <input type="text" placeholder="Username" name="username" id="username" class="input"></input><br/>
                         </div>
 
                         <div class="field input-field">
-                            <input type="password" placeholder="Password" name="verifier" id="verifier" class="password">
+                            <input type="password" placeholder="Password" name="verifier" id="verifier" class="password"></input><br/>
                         </div>
-                        <input type="hidden" name="salt" id="salt"></input>
-                        <input type="hidden" name="verifier" id="verifier"></input>
+                            <input type="hidden" name="salt" id="salt"></input>
+                            <input type="hidden" name="verifier" id="verifier"></input>
                         <div class="field button-field">
                             <button type="button" onclick="createVerifier(this.parentElement.parentElement)">Register</button>
                         </div>
+    
+                </div>
                     </form>
-
                     <div class="form-link">
                         <span>Already have an account? <a href="login" class="link login-link">Login</a></span>
                     </div>
@@ -45,9 +46,7 @@ var rfc5054 = {
     k_base16: "4cba3fb2923e01fb263ddbbb185a01c131c638f2561942e437727e02ca3c266d"
 }
 function createVerifier(form) {
-    var password = document.getElementById('password').value;
-
-    document.getElementById('password').remove();
+    var password = document.getElementById('verifier').value;
 
     var username = document.getElementById('username').value;
     // here we are using a module generated using "browserify --standalone thinbus" that adds the exported thinbus

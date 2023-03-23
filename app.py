@@ -10,7 +10,6 @@ from base64 import b64encode, b64decode
 from datetime import timedelta
 
 app = Flask(__name__)
-app.secret = b'\xf7C\xb9H\x83e\xa5?E\xc5^p\xae#\xfb\xed\tc\x02p-\xd2_\x04KqWi\x99\n\xe1A' #random 32 bytes key
 app.secret_key = secrets.token_hex(32)
 
 conn = sqlite3.connect('users.db', check_same_thread=False)
@@ -38,10 +37,6 @@ def convert_to_bytes(string):
     string = bytes([int(string[i:i + 2], 16) for i in range(0, len(string), 2)])
     return string
 
-
-def decrypt_verifier(verifier):
-    cipher = AES.new(app.secret, AES.MODE_ECB)
-    return cipher.decrypt(b64decode(verifier))
 
 
 def encrypt_AES_CBC(key, data):
@@ -94,7 +89,7 @@ def challenge():
     # Retrieve the user's salt and verifier from the database
     salt, verifier = user_info
     salt = convert_to_bytes(salt)
-    verifier = decrypt_verifier(verifier)
+    verifier = convert_to_bytes(verifier)
 
     # server computes public ephemeral value B as a challenge value
     svr = srp.Verifier(username, salt, verifier, hash_alg=srp.SHA256)
@@ -118,14 +113,8 @@ def register():
         username = request.form['username']
         verifier = request.form['verifier']
         salt = request.form['salt']
-
-        #Encrypt verifier using aes
-        cipher = AES.new(app.secret, AES.MODE_ECB)
-        encrypted_v = b64encode(cipher.encrypt(convert_to_bytes(verifier)))
-
-
         # Save the user's salt and verifier to a database or file
-        c.execute("INSERT OR IGNORE INTO users VALUES (?, ?, ?)", (username, encrypted_v, salt))
+        c.execute("INSERT OR IGNORE INTO users VALUES (?, ?, ?)", (username, verifier, salt))
         conn.commit()
 
         # Printing salt and verifier to the console
@@ -153,7 +142,7 @@ def authenticate():
         user_info = get_user(username)
         salt, verifier = user_info
         salt = convert_to_bytes(salt)
-        verifier = decrypt_verifier(verifier)
+        verifier = convert_to_bytes(verifier)
         A = convert_to_bytes(A)
         M1 = convert_to_bytes(M1)
         b = cache[0]

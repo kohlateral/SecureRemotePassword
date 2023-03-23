@@ -153,7 +153,7 @@ def authenticate():
             return redirect(url_for('login'))
         cache.pop()
         print("HAMK: ", HAMK)
-        session['ID'] = hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest()
+        session['ID'] = username
         session['sharedKey'] = svr.get_session_key()
         return redirect(url_for('welcome'))
 

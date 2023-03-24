@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Flask Intro</title>
+  <title>Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/css/welcomeCSS.css">
 </head>
@@ -15,46 +15,55 @@
     </ul>
   </div>
   <div class="container">
-    <div class="card">
-      <div class="card_inner">
-        <div class="front">
-          <img src="/static/images/map.png" class="map_img">
-          <div class="row">
-            <img src="/static/images/chip.png" width="60px">
-            <img src="/static/images/visa.png" width="80px">
-          </div>
-          <div class="row card_num">
-            <p id="encrypted">{{ encrypted_data }}</p>
-            <p id="iv">{{ iv }}</p>
-          </div>
-          <div class="row card_info">
-            <p>CARD HOLDER</p>
-            <p>VALID TILL</p>
-          </div>
-          <div class="row name">
-            <p>USER</p>
-            <p>01/28</p>
+    <div class="card-container">
+      <div class="wrapper">
+        <header>Cryptovoyage Card</header>
+        <div class="card">
+          <div class="card_inner">
+            <div class="front">
+              <img src="/static/images/map.png" class="map_img">
+              <div class="row">
+                <img src="/static/images/chip.png" width="60px">
+                <div class="cardname">Cryptovoyage</div>
+                <img src="/static/images/visa.png" width="80px">
+              </div>
+              <div class="row card_num">
+                <p id="encrypted">{{ encrypted_data }}</p>
+                <p id="iv">{{ iv }}</p>
+              </div>
+              <div class="row card_info">
+                <p>CARD HOLDER</p>
+                <p>VALID TILL</p>
+              </div>
+              <div class="row name">
+                <p>Team 21</p>
+                <p>01/28</p>
+              </div>
+            </div>
+            <div class="back">
+              <img src="/static/images/map.png" class="map_img">
+              <div class="bar"></div>
+                <div class="row card_cvv">
+                  <div>
+                    <img src="/static/images/pattern.png">
+                  </div>
+                  <p>123</p>
+                </div>
+                <div class="row card_text">
+                  <p>This is a virtual card design</p>
+                </div>
+                <div class="row signature">
+                  <p>CUSTOMER SIGNATURE</p>
+                  <img src="/static/images/visa.png" width="80px">
+                </div>
+            </div>
           </div>
         </div>
-        <div class="back">
-          <img src="/static/images/map.png" class="map_img">
-          <div class="bar"></div>
-            <div class="row card_cvv">
-              <div>
-                <img src="/static/images/pattern.png">
-              </div>
-              <p>123</p>
-            </div>
-            <div class="row card_text">
-              <p>This is a virtual card design</p>
-            </div>
-            <div class="row signature">
-              <p>CUSTOMER SIGNATURE</p>
-              <img src="/static/images/visa.png" width="80px">
-            </div>
+        <div class="form-link">
+          <span>Please keep your card details private.</span>
         </div>
       </div>
-    </div>
+     </div> 
   </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"

@@ -43,7 +43,7 @@
     width: 100%;
 }
 .container{
-    min-height: 87.7vh;
+    min-height: 100vh;
     width: 100%;
     background: #9B7C60;
     display: flex;

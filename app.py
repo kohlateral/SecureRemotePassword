@@ -22,8 +22,10 @@ c.execute('''CREATE TABLE IF NOT EXISTS users
 cache = []
 
 
-# A helper function to get a user's salt and verifier from the database
 def get_user(username):
+    """
+    A helper function to get a user's salt and verifier from the database
+    """
     c.execute('SELECT salt, verifier FROM users WHERE username=?', (username,))
     row = c.fetchone()
     if row:
@@ -34,9 +36,12 @@ def get_user(username):
 
 
 def convert_to_bytes(string):
+    """
+    A helper function to convert a hex string to bytes. bytes.frombytes() is not used because it cannot
+    handle long strings
+    """
     string = bytes([int(string[i:i + 2], 16) for i in range(0, len(string), 2)])
     return string
-
 
 
 def encrypt_AES_CBC(key, data):
@@ -97,6 +102,7 @@ def challenge():
 
     # server computes private ephemeral value b and stores it in cache
     b = svr.get_ephemeral_secret()
+    print("B", B.hex())
     cache.append(b)
     print("b: ", b.hex())
     if s is None or B is None:
@@ -130,23 +136,28 @@ def authenticate():
     if request.method == 'POST':
         credentials = request.form['credentials']
         credentials = json.loads(credentials)
-        # A is the client's challenge value
-        A = credentials['A']
 
-        # M1 is the client's proof of knowledge of the password
+        # Retrieve A and M1 from the client. A is the client's public ephemeral value and M1 is the client's proof
+        A = credentials['A']
         M1 = credentials['M1']
         username = credentials['username']
         print("A: ", A)
         print("M1: ", M1)
         print("username: ", username)
+
+        # Retrieve the user's salt and verifier from the database
         user_info = get_user(username)
         salt, verifier = user_info
         salt = convert_to_bytes(salt)
         verifier = convert_to_bytes(verifier)
+
+        # Retrieve b from the cache and compute the server's proof M2
         A = convert_to_bytes(A)
         M1 = convert_to_bytes(M1)
         b = cache[0]
         svr = srp.Verifier(username, salt, verifier, A, hash_alg=srp.SHA256, bytes_b=b)
+
+        # Verify the client's proof M1 and create HAMK which can be sent back to client for verificationq
         HAMK = svr.verify_session(M1, A)
         if HAMK is None:
             cache.pop()
@@ -160,9 +171,9 @@ def authenticate():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    session.pop('ID', None)
+    session.clear()
     return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 5000)
+    app.run('0.0.0.0', 5000, ssl_context='adhoc')

@@ -71,7 +71,7 @@ function autenticate(form) {
 
             document.getElementById('credentials').value = JSON.stringify(credentials);
 
-            console.log("shared key: "+srpClient.getSessionKey());
+            {#console.log("shared key: "+srpClient.getSessionKey());#}
 
             sessionStorage.setItem('sharedKey', srpClient.getSessionKey());
             form.submit();
